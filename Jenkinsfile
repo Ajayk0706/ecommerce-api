@@ -22,7 +22,25 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t ecommerce-api:v1 .'
+                sh 'docker build -t ajay0706/ecommerce-api:v1 .'
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ajay0706/ecommerce-api:v1
+                        docker logout
+                    '''
+                }
             }
         }
     }
